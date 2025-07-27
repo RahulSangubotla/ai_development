@@ -1,17 +1,17 @@
-research_task:
-  description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
-  expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+# In config/tasks.yaml
 
-reporting_task:
+routing_task:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    You are assisting a single, logged-in user. The user ID is handled automatically. **Do not ask for a user ID or any other personal identification.**
+
+    Review the conversation history to understand the context:
+    ---
+    {history}
+    ---
+    Now, analyze the latest user query: '{query}'.
+    Based on the query and the history, determine the user's intent (e.g., answering a question, applying for a loan).
+    If the latest query provides information that a specialist was asking for, delegate back to that specialist.
+    If the intent is clear and all information is available, delegate to the correct specialist agent to perform the action.
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    A final, comprehensive response to the user. This could be a direct answer, a clarifying question from a specialist,
+    or a confirmation that an action has been completed.

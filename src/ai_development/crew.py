@@ -3,6 +3,7 @@ from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
 from crewai_tools import SerperDevTool
+from .tools.custom_tool import BankingTool
 
 # If you want to run a snippet of code before or after the crew starts,
 # you can use the @before_kickoff and @after_kickoff decorators
@@ -21,35 +22,73 @@ class AiDevelopment():
     
     # If you would like to add tools to your agents, you can learn more about it here:
     # https://docs.crewai.com/concepts/agents#agent-tools
-    @agent
-    def researcher(self) -> Agent:
-        return Agent(
-            config=self.agents_config['researcher'], # type: ignore[index]
-            verbose=True,
-            tools=[SerperDevTool()]
-        )
+    # @agent
+    # def researcher(self) -> Agent:
+    #     return Agent(
+    #         config=self.agents_config['researcher'], # type: ignore[index]
+    #         verbose=True,
+    #         tools=[SerperDevTool()]
+    #     )
 
+    # @agent
+    # def reporting_analyst(self) -> Agent:
+    #     return Agent(
+    #         config=self.agents_config['reporting_analyst'], # type: ignore[index]
+    #         verbose=True
+    #     )
+
+    # # To learn more about structured task outputs,
+    # # task dependencies, and task callbacks, check out the documentation:
+    # # https://docs.crewai.com/concepts/tasks#overview-of-a-task
+    # @task
+    # def research_task(self) -> Task:
+    #     return Task(
+    #         config=self.tasks_config['research_task'], # type: ignore[index]
+    #     )
+
+    # @task
+    # def reporting_task(self) -> Task:
+    #     return Task(
+    #         config=self.tasks_config['reporting_task'], # type: ignore[index]
+    #         output_file='report.md'
+    #     )
     @agent
-    def reporting_analyst(self) -> Agent:
+    def banking_router(self) -> Agent:
         return Agent(
-            config=self.agents_config['reporting_analyst'], # type: ignore[index]
+            config=self.agents_config['banking_router'],
+            allow_delegation=True, # Crucial for routing tasks
             verbose=True
         )
 
-    # To learn more about structured task outputs,
-    # task dependencies, and task callbacks, check out the documentation:
-    # https://docs.crewai.com/concepts/tasks#overview-of-a-task
-    @task
-    def research_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['research_task'], # type: ignore[index]
+    @agent
+    def fraud_specialist(self) -> Agent:
+        return Agent(
+            config=self.agents_config['fraud_specialist'],
+            tools=[BankingTool()], # Assign the specific tool
+            verbose=True
+        )
+
+    @agent
+    def account_services_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['account_services_agent'],
+            tools=[BankingTool()],
+            verbose=True
+        )
+
+    @agent
+    def loan_officer_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['loan_officer_agent'],
+            tools=[BankingTool()],
+            verbose=True
         )
 
     @task
-    def reporting_task(self) -> Task:
+    def routing_task(self) -> Task:
         return Task(
-            config=self.tasks_config['reporting_task'], # type: ignore[index]
-            output_file='report.md'
+            config=self.tasks_config['routing_task'],
+            agent=self.banking_router() # Assign this task to the router agent
         )
 
     @crew
